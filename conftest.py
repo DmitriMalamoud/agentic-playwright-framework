@@ -16,9 +16,8 @@ def pytest_runtest_makereport(item, call):
     extra = getattr(report, "extra", [])
 
     if report.when == "call":
-        print(f"\nDEBUG: pytest_runtest_makereport called for {item.name}")
-        
-        # 1. Attach Screenshots
+        # 1. Prepare Screenshots (but don't append yet)
+        screenshot_extras = []
         screenshot_dir = "screenshots"
         if os.path.exists(screenshot_dir):
             for file in os.listdir(screenshot_dir):
@@ -28,16 +27,17 @@ def pytest_runtest_makereport(item, call):
                         with open(filepath, "rb") as f:
                             encoded = base64.b64encode(f.read()).decode("utf-8")
                             from pytest_html import extras
-                            # Add image as HTML to force it into the self-contained report
-                            html_content = f'<div><p><b>{file}</b></p><img src="data:image/png;base64,{encoded}" style="width:600px; border: 2px solid #ddd;"></div>'
-                            extra.append(extras.html(html_content))
-                            print(f"DEBUG: Attached screenshot {file}")
+                            # Add image as HTML
+                            html_content = f'<div style="margin-top: 20px;"><p><b>Screenshot: {file}</b></p><img src="data:image/png;base64,{encoded}" style="width:800px; border: 1px solid #ddd;"></div>'
+                            screenshot_extras.append(extras.html(html_content))
                     except Exception as e:
-                        print(f"DEBUG: Error attaching screenshot: {e}")
+                        logger.error(f"Error processing screenshot for report: {e}")
 
-        # Add a clear text marker to prove extras are working
-        from pytest_html import extras
-        extra.append(extras.text("=== VISUAL EVIDENCE ATTACHED ==="))
+        # 2. Append everything else first (if any)
+        # ...
+        
+        # 3. Append screenshots at the end of the extras list
+        extra.extend(screenshot_extras)
         
         # Re-assign the extra list to the report
         report.extra = extra
