@@ -14,7 +14,9 @@ def take_screenshot(page: Page, filename: str = "latest_action.png"):
     filepath = os.path.join(screenshot_dir, filename)
     
     try:
-        page.screenshot(path=filepath)
+        # Use jpeg format with compression for smaller size if needed, 
+        # but for now sticking to png with a smaller viewport or quality if supported
+        page.screenshot(path=filepath, type="png")
         logger.info(f"Screenshot saved to: {filepath}")
     except Exception as e:
         logger.error(f"Failed to take screenshot. Error: {str(e)}")

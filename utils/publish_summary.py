@@ -40,13 +40,13 @@ def publish_summary():
                         continue
                         
                     with open(filepath, "rb") as image_file:
-                        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                        # Ensure no newlines in the base64 string
+                        encoded_string = base64.b64encode(image_file.read()).decode('utf-8').replace('\n', '').replace('\r', '')
                     
                     summary_content += f"### {screenshot}\n"
-                    # Check if the encoded string is too large (GH Summary limit is 1024KB total)
-                    # Reducing threshold slightly to be safe with multiple images
-                    if len(encoded_string) < 700000: 
-                        summary_content += f"![{screenshot}](data:image/png;base64,{encoded_string})\n\n"
+                    # Reducing threshold to 500KB for better reliability
+                    if len(encoded_string) < 500000: 
+                        summary_content += f'<img src="data:image/png;base64,{encoded_string}" width="600" />\n\n'
                     else:
                         summary_content += f"⚠️ Screenshot {screenshot} is too large to display inline ({len(encoded_string)} chars).\n\n"
         except Exception as e:
