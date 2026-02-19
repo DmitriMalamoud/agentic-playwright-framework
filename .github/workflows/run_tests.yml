@@ -33,24 +33,14 @@ jobs:
       if: always()
       run: |
         poetry run python utils/publish_summary.py
-    - name: Upload Test Report
+        cat $GITHUB_STEP_SUMMARY
+    - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: playwright-html-report
-        path: report.html
-        retention-days: 30
-    - name: Upload Logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-logs
-        path: logs/
-        retention-days: 30
-    - name: Upload screenshots
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-screenshots
-        path: screenshots/
+        name: test-results-all
+        path: |
+          report.html
+          screenshots/
+          logs/
         retention-days: 30

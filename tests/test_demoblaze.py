@@ -3,6 +3,12 @@ from pages.HomePage import HomePage
 from utils.logger import logger
 
 def test_demoblaze_categories(web_app):
+    import os
+    import shutil
+    if os.path.exists("screenshots"):
+        shutil.rmtree("screenshots")
+    os.makedirs("screenshots")
+
     home_page = HomePage(web_app)
     
     # 1. Navigate to https://www.demoblaze.com/

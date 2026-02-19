@@ -20,6 +20,26 @@ def pytest_runtest_makereport(item, call):
         elif rep.skipped:
             logger.info(f"Test SKIPPED: {item.name}")
 
+        # Attach screenshots to the HTML report
+        from pytest_html import extras
+        import base64
+        import os
+        
+        screenshot_dir = "screenshots"
+        if os.path.exists(screenshot_dir):
+            for file in os.listdir(screenshot_dir):
+                if file.endswith(".png"):
+                    filepath = os.path.join(screenshot_dir, file)
+                    try:
+                        with open(filepath, "rb") as f:
+                            encoded = base64.b64encode(f.read()).decode("utf-8")
+                            # Add to the report's extra section
+                            if not hasattr(rep, 'extra'):
+                                rep.extra = []
+                            rep.extra.append(extras.image(encoded, name=file))
+                    except Exception as e:
+                        logger.error(f"Failed to attach screenshot {file} to report: {e}")
+
 @pytest.fixture(scope="function")
 def web_app(request):
     test_name = request.node.name
