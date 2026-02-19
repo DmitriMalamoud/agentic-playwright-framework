@@ -35,15 +35,20 @@ def publish_summary():
                 summary_content += "## 📸 Visual Evidence\n"
                 for screenshot in screenshots:
                     filepath = os.path.join(screenshot_dir, screenshot)
+                    if not os.path.exists(filepath):
+                        summary_content += f"❌ Screenshot file not found: {screenshot}\n\n"
+                        continue
+                        
                     with open(filepath, "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
                     
                     summary_content += f"### {screenshot}\n"
                     # Check if the encoded string is too large (GH Summary limit is 1024KB total)
-                    if len(encoded_string) < 800000: # ~800KB buffer
+                    # Reducing threshold slightly to be safe with multiple images
+                    if len(encoded_string) < 700000: 
                         summary_content += f"![{screenshot}](data:image/png;base64,{encoded_string})\n\n"
                     else:
-                        summary_content += f"⚠️ Screenshot {screenshot} is too large to display inline.\n\n"
+                        summary_content += f"⚠️ Screenshot {screenshot} is too large to display inline ({len(encoded_string)} chars).\n\n"
         except Exception as e:
             summary_content += f"Error processing screenshots: {str(e)}\n"
 
