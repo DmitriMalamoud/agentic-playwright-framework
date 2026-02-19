@@ -22,7 +22,6 @@ def pytest_runtest_makereport(item, call):
 
         # Attach screenshots to the HTML report
         from pytest_html import extras
-        import base64
         import os
         
         if not hasattr(rep, 'extra'):
@@ -36,20 +35,12 @@ def pytest_runtest_makereport(item, call):
                     filepath = os.path.join(screenshot_dir, file)
                     try:
                         with open(filepath, "rb") as f:
-                            encoded = base64.b64encode(f.read()).decode("utf-8")
-                            rep.extra.append(extras.image(encoded, name=file))
+                            # pytest-html 4.0+ handles bytes by base64 encoding them
+                            rep.extra.append(extras.image(f.read(), name=file))
                     except Exception as e:
                         logger.error(f"Failed to attach screenshot {file} to report: {e}")
 
-        # 2. Attach Logs
-        log_file = os.path.join("logs", "test.log")
-        if os.path.exists(log_file):
-            try:
-                with open(log_file, "r") as f:
-                    log_content = f.read()
-                    rep.extra.append(extras.text(log_content, name="Execution Logs"))
-            except Exception as e:
-                logger.error(f"Failed to attach logs to report: {e}")
+        # Removed manual log attachment as it causes duplication with pytest's own capture
 
 @pytest.fixture(scope="function")
 def web_app(request):
