@@ -21,11 +21,18 @@ def pytest_runtest_makereport(item, call):
             logger.info(f"Test SKIPPED: {item.name}")
 
         # Attach screenshots to the HTML report
-        from pytest_html import extras
         import os
+        import base64
+        
+        # Get the pytest-html plugin
+        pytest_html = item.config.pluginmanager.getplugin("html")
         
         if not hasattr(rep, 'extra'):
             rep.extra = []
+
+        # Diagnostic text
+        if pytest_html:
+            rep.extra.append(pytest_html.extras.text("Visual Evidence Processing..."))
 
         # 1. Attach Screenshots
         screenshot_dir = "screenshots"
@@ -34,8 +41,12 @@ def pytest_runtest_makereport(item, call):
                 if file.endswith(".png"):
                     filepath = os.path.join(screenshot_dir, file)
                     try:
-                        # Use the relative path for the image extra
-                        rep.extra.append(extras.image(filepath, name=file))
+                        with open(filepath, "rb") as f:
+                            encoded = base64.b64encode(f.read()).decode("utf-8")
+                            # Using html extra to force rendering
+                            html = f'<div><p>{file}</p><img src="data:image/png;base64,{encoded}" style="width:600px;"></div>'
+                            if pytest_html:
+                                rep.extra.append(pytest_html.extras.html(html))
                     except Exception as e:
                         logger.error(f"Failed to attach screenshot {file} to report: {e}")
 
