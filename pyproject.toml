@@ -1,0 +1,25 @@
+[project]
+name = "agentic-playwright-framework"
+version = "0.1.0"
+description = "A Python 3.13 Playwright framework for agentic automation"
+authors = [
+    { name = "Dmitri Malamoud", email = "dm.melamud@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "playwright>=1.50.0",
+    "pytest>=8.3.4",
+    "pytest-playwright>=0.7.0",
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "--headed --browser chromium"
