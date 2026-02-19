@@ -2,6 +2,11 @@ name: Playwright Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'info'
 
 jobs:
   test:
