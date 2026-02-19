@@ -1,5 +1,4 @@
 import os
-import base64
 import sys
 
 def publish_summary():
@@ -9,6 +8,9 @@ def publish_summary():
         return
 
     summary_content = "# 🧪 Test Execution Report\n\n"
+    
+    summary_content += "### 📊 Visual Report Available\n"
+    summary_content += "A detailed HTML report with integrated screenshots is available in the **Artifacts** section of this run (see `playwright-html-report`).\n\n"
 
     # 1. Add Logs
     log_file = "logs/test.log"
@@ -18,39 +20,12 @@ def publish_summary():
         summary_content += "```text\n"
         try:
             with open(log_file, "r") as f:
-                # Take last 100 lines to avoid size limits if log is huge
                 lines = f.readlines()
                 summary_content += "".join(lines[-100:])
         except Exception as e:
             summary_content += f"Error reading log file: {str(e)}\n"
         summary_content += "```\n"
         summary_content += "</details>\n\n"
-
-    # 2. Add Screenshots
-    screenshot_dir = "screenshots"
-    if os.path.exists(screenshot_dir):
-        try:
-            screenshots = [f for f in os.listdir(screenshot_dir) if f.endswith('.png')]
-            if screenshots:
-                summary_content += "## 📸 Visual Evidence\n"
-                for screenshot in screenshots:
-                    filepath = os.path.join(screenshot_dir, screenshot)
-                    if not os.path.exists(filepath):
-                        summary_content += f"❌ Screenshot file not found: {screenshot}\n\n"
-                        continue
-                        
-                    with open(filepath, "rb") as image_file:
-                        # Ensure no newlines in the base64 string
-                        encoded_string = base64.b64encode(image_file.read()).decode('utf-8').replace('\n', '').replace('\r', '')
-                    
-                    summary_content += f"### {screenshot}\n"
-                    # Reducing threshold to 500KB for better reliability
-                    if len(encoded_string) < 500000: 
-                        summary_content += f'<img src="data:image/png;base64,{encoded_string}" width="600" />\n\n'
-                    else:
-                        summary_content += f"⚠️ Screenshot {screenshot} is too large to display inline ({len(encoded_string)} chars).\n\n"
-        except Exception as e:
-            summary_content += f"Error processing screenshots: {str(e)}\n"
 
     with open(summary_file, "a", encoding="utf-8") as f:
         f.write(summary_content)

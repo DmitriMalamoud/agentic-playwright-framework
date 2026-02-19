@@ -28,11 +28,18 @@ jobs:
         poetry run playwright install --with-deps chromium
     - name: Run Playwright tests
       run: |
-        poetry run pytest tests/test_demoblaze.py --headless-mode true
+        poetry run pytest tests/test_demoblaze.py --headless-mode true --html=report.html --self-contained-html
     - name: Publish Test Summary
       if: always()
       run: |
         poetry run python utils/publish_summary.py
+    - name: Upload Test Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-html-report
+        path: report.html
+        retention-days: 30
     - name: Upload Logs
       if: always()
       uses: actions/upload-artifact@v4
