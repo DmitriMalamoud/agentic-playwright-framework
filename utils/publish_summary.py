@@ -10,7 +10,7 @@ def publish_summary():
     summary_content = "# 🧪 Test Execution Report\n\n"
     
     summary_content += "### 📊 Visual Report Available\n"
-    summary_content += "A detailed HTML report with integrated screenshots is available in the **Artifacts** section of this run (see `playwright-html-report`).\n\n"
+    summary_content += "A detailed, self-contained HTML report with integrated screenshots and logs is available in the **Artifacts** section of this run (see `test-results-all`).\n\n"
 
     # 1. Add Logs
     log_file = "logs/test.log"

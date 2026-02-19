@@ -25,6 +25,10 @@ def pytest_runtest_makereport(item, call):
         import base64
         import os
         
+        if not hasattr(rep, 'extra'):
+            rep.extra = []
+
+        # 1. Attach Screenshots
         screenshot_dir = "screenshots"
         if os.path.exists(screenshot_dir):
             for file in os.listdir(screenshot_dir):
@@ -33,12 +37,19 @@ def pytest_runtest_makereport(item, call):
                     try:
                         with open(filepath, "rb") as f:
                             encoded = base64.b64encode(f.read()).decode("utf-8")
-                            # Add to the report's extra section
-                            if not hasattr(rep, 'extra'):
-                                rep.extra = []
                             rep.extra.append(extras.image(encoded, name=file))
                     except Exception as e:
                         logger.error(f"Failed to attach screenshot {file} to report: {e}")
+
+        # 2. Attach Logs
+        log_file = os.path.join("logs", "test.log")
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, "r") as f:
+                    log_content = f.read()
+                    rep.extra.append(extras.text(log_content, name="Execution Logs"))
+            except Exception as e:
+                logger.error(f"Failed to attach logs to report: {e}")
 
 @pytest.fixture(scope="function")
 def web_app(request):
