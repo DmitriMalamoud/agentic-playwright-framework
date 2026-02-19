@@ -15,12 +15,6 @@ class Logger:
                 datefmt='%Y-%m-%d %H:%M:%S'
             )
 
-            # Create handler that outputs to stdout
-            stdout_handler = logging.StreamHandler(sys.stdout)
-            stdout_handler.setLevel(logging.INFO)
-            stdout_handler.setFormatter(formatter)
-            logger.addHandler(stdout_handler)
-
             # Create handler that outputs to file
             log_dir = "logs"
             if not os.path.exists(log_dir):

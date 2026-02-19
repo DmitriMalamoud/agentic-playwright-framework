@@ -34,9 +34,8 @@ def pytest_runtest_makereport(item, call):
                 if file.endswith(".png"):
                     filepath = os.path.join(screenshot_dir, file)
                     try:
-                        with open(filepath, "rb") as f:
-                            # pytest-html 4.0+ handles bytes by base64 encoding them
-                            rep.extra.append(extras.image(f.read(), name=file))
+                        # Use the relative path for the image extra
+                        rep.extra.append(extras.image(filepath, name=file))
                     except Exception as e:
                         logger.error(f"Failed to attach screenshot {file} to report: {e}")
 
