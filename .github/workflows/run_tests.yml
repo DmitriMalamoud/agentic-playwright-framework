@@ -28,6 +28,17 @@ jobs:
     - name: Run Playwright tests
       run: |
         poetry run pytest tests/test_demoblaze.py --headless-mode true
+    - name: Publish Test Summary
+      if: always()
+      run: |
+        poetry run python utils/publish_summary.py
+    - name: Upload Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: logs/
+        retention-days: 30
     - name: Upload screenshots
       if: always()
       uses: actions/upload-artifact@v4

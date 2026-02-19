@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 class Logger:
     @staticmethod
@@ -8,19 +9,27 @@ class Logger:
         if not logger.handlers:
             logger.setLevel(logging.INFO)
             
-            # Create handler that outputs to stdout
-            handler = logging.StreamHandler(sys.stdout)
-            handler.setLevel(logging.INFO)
-            
             # Create formatter
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                 datefmt='%Y-%m-%d %H:%M:%S'
             )
-            handler.setFormatter(formatter)
+
+            # Create handler that outputs to stdout
+            stdout_handler = logging.StreamHandler(sys.stdout)
+            stdout_handler.setLevel(logging.INFO)
+            stdout_handler.setFormatter(formatter)
+            logger.addHandler(stdout_handler)
+
+            # Create handler that outputs to file
+            log_dir = "logs"
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
             
-            # Add handler to logger
-            logger.addHandler(handler)
+            file_handler = logging.FileHandler(os.path.join(log_dir, "test.log"), mode='w')
+            file_handler.setLevel(logging.INFO)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
         
         return logger
 
